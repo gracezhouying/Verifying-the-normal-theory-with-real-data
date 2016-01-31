@@ -1,0 +1,40 @@
+# loads a data frame called "dat"
+load("04cars.rda") 
+# extract selected variables
+tmp = dat[,c(13,15,16,18,19)]
+# extracts complete cases 
+tmp = tmp[complete.cases(tmp),] 
+tmp = as.data.frame(tmp)
+# abbreviate names
+names(tmp) = c("hp","mpg","wt","len","wd") 
+
+dat = tmp
+str(dat)
+head(dat)
+# creates a variables for each column
+attach(dat) 
+dat=dat[,1:2]
+fit0=lm(mpg~hp,data=dat)
+
+#loop for 1000 times and initiate index=0
+vecslope=c()   
+index=0   
+for(i in 1:1000){
+v=dat[sample(nrow(dat),50,replace=F),]
+fit=lm(mpg~hp,data = v)
+ci=confint(fit)
+slope=fit0$coefficients[[2]]
+vecslope[i]=fit$coefficients[[2]]
+if(slope<ci[2,2]&&slope>ci[2,1]){
+index=index+1}
+}
+#A.Return the proportion of times that the CI contains the LS slope coefficient from the entire dataset. Offer some very brief comment.
+proportion=index/1000
+proportion
+#the proportion is about 0.8XX, this shows that the sample model of size 50 somewhat in accordance with the entire model,
+however, it is not very accurate since the proportion is not very close to 1.
+
+#B.Plot the LS slope coefficients from the simulation as a histogram, what distribution would you expect?
+hist(vecslope,prob=TRUE,breaks=50)
+# the distribution is almost a normal distribution.
+
